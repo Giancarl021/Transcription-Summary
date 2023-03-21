@@ -1,5 +1,5 @@
 import { mkdirSync as mkdir, existsSync as exists, rmSync as rm } from 'fs';
-import multer from 'multer';
+import multer, { Options } from 'multer';
 import constants from '../util/constants';
 import Logger from '../services/Logger';
 
@@ -16,7 +16,7 @@ mkdir(constants.paths.temp, { recursive: true });
 
 logger.debug('Generating multer options');
 
-const options: multer.Options = {
+const options: Options = {
     storage: multer.diskStorage({
         destination: constants.paths.temp,
         filename(_, file, callback) {

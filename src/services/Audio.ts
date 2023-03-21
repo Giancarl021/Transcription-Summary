@@ -1,11 +1,10 @@
 import ffmpegPath from 'ffmpeg-static';
 import { path as ffprobePath } from 'ffprobe-static';
-import { spawn } from 'child_process';
-import constants from '../util/constants';
 import { lstat, mkdir, rm } from 'fs/promises';
 import { megabytes } from '../util/storageSize';
 import Logger from './Logger';
 import spawnPromise from '../util/spawnPromise';
+import Nullable from '../interfaces/Nullable';
 
 type AudioSilenceMessage =
     | {
@@ -31,8 +30,8 @@ export default function (inputFile: string) {
     logger.info(`Creating audio service for file ${inputFile}`);
 
     const context = {
-        compressedFile: null as string | null,
-        splitFilesDir: null as string | null,
+        compressedFile: null as Nullable<string>,
+        splitFilesDir: null as Nullable<string>,
         splitFiles: [] as string[]
     };
 
@@ -115,7 +114,7 @@ export default function (inputFile: string) {
             });
 
         const silencePoints: AudioSilencePoint[] = [];
-        let currentStart: number | null = null;
+        let currentStart: Nullable<number> = null;
 
         for (const message of messages) {
             if (
