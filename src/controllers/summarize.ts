@@ -1,24 +1,31 @@
 import { Request, Response } from 'express';
-import Audio from '../services/Audio';
-import Transcription from '../services/Transcription';
+import Summarizer from '../services/Summarizer';
+import Logger from '../services/Logger';
+
+const logger = Logger('controllers:summarize');
 
 export default async function (request: Request, response: Response) {
-    const audioFile = request.file;
+    logger.info('Processing summarization request');
 
-    if (!audioFile) {
-        return response.status(400).json({
-            error: 'No audio file was provided'
+    const { transcription } = request;
+    const { language = 'en' } = request.body;
+
+    if (!transcription) {
+        logger.error('No transcription found');
+        return response.status(404).json({
+            error: 'No transcription found'
         });
     }
 
-    const audio = Audio(audioFile.path);
+    logger.debug('Creating summarizer');
 
-    const convertedAudio = await audio.convert();
-    const transcription = Transcription(convertedAudio[0]);
+    const summarizer = Summarizer(language);
 
-    const result = await transcription.transcribe();
+    logger.debug('Summarizing transcription');
 
-    await audio.end();
+    const result = await summarizer.summarize(transcription);
 
-    return response.send(result);
+    logger.info('Finishing summarization request');
+
+    return response.json({ summary: result });
 }

@@ -1,23 +1,38 @@
-import { File } from 'buffer';
 import { createReadStream } from 'fs';
-import { readFile } from 'fs/promises';
 import { OpenAIApi } from 'openai';
 import openAiConfig from '../config/openAi';
+import Logger from './Logger';
 
-export default function (audioFilePath: string, initialDescription?: string) {
+const logger = Logger('services:transcriber');
+
+export default function (
+    audioFilePaths: string[],
+    initialDescription?: string
+) {
+    logger.debug('Creating OpenAI API instance');
     const api = new OpenAIApi(openAiConfig);
 
     async function transcribe() {
-        const response = await api.createTranscription(
-            createReadStream(audioFilePath) as any,
-            'whisper-1',
-            initialDescription,
-            'verbose_json'
-        );
+        logger.info('Starting transcription...');
+        const blocks: string[] = [];
 
-        console.log(response);
+        for (const audioFilePath of audioFilePaths) {
+            logger.debug(
+                `[${blocks.length}] Transcribing file ${audioFilePath}...`
+            );
 
-        return response.data;
+            const response = await api.createTranscription(
+                createReadStream(audioFilePath) as any,
+                'whisper-1',
+                initialDescription + '\n' + blocks.slice(-1).join('\n'),
+                'json'
+            );
+
+            blocks.push(response.data.text);
+        }
+
+        logger.info('Finished transcription');
+        return blocks.join('\n\n');
     }
 
     return {
