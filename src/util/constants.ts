@@ -1,8 +1,9 @@
+import { LogLevelValues } from './../interfaces/LogLevel';
 import locate from '@giancarl021/locate';
 import LogLevel from '../interfaces/LogLevel';
 import { gigabytes } from './storageSize';
 import { minutes } from './timeOperations';
-import validate, { stringToNumberValidator } from './validate';
+import validate, { required, stringToNumberValidator } from './validate';
 
 export default {
     limits: {
@@ -31,7 +32,7 @@ export default {
         root: locate('.')
     } as const,
     keys: {
-        openAi: process.env.OPEN_AI_KEY
+        openAi: required(process.env.OPEN_AI_KEY, 'OPEN_AI_KEY')
     } as const,
     summarization: {
         systemMessage(lang: string) {
@@ -42,7 +43,10 @@ export default {
         }
     } as const,
     log: {
-        level: (String(process.env.LOG_LEVEL).toLowerCase() ||
-            'info') as LogLevel
+        level: validate<string, LogLevel>(
+            process.env.LOG_LEVEL,
+            l => Boolean(l && Object.keys(LogLevelValues).includes(l)),
+            'info'
+        )
     } as const
 };

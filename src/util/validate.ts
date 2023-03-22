@@ -2,13 +2,13 @@ import { Optional } from '../interfaces/Nullable';
 
 type Validator<T> = (toValidate: Optional<T>) => boolean;
 
-export default function <T>(
+export default function <T, TCast = T>(
     toValidate: Optional<T>,
     validator: Validator<T>,
-    defaultValue: T
-): T {
+    defaultValue: TCast
+): TCast {
     if (validator(toValidate)) {
-        return toValidate as T;
+        return toValidate as TCast;
     }
 
     return defaultValue;
@@ -30,4 +30,13 @@ stringToNumberValidator.negatives = stringToNumberValidator(n => n < 0);
 stringToNumberValidator.nonNegatives = stringToNumberValidator(n => n >= 0);
 stringToNumberValidator.nonPositives = stringToNumberValidator(n => n <= 0);
 
-export { stringToNumberValidator };
+function required(toValidate: Optional<string>, fieldName: string): string {
+    if (typeof toValidate !== 'string' || !toValidate.trim().length)
+        throw new Error(
+            `Required environment variables ${fieldName} is missing or empty`
+        );
+
+    return toValidate;
+}
+
+export { stringToNumberValidator, required };
