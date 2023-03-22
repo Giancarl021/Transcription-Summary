@@ -14,9 +14,9 @@ export default function <T>(
     return defaultValue;
 }
 
-export function stringToNumberValidator(
+const stringToNumberValidator = (
     extraCheck: (n: number) => boolean = _ => true
-): Validator<string> {
+): Validator<string> => {
     return n => {
         if (typeof n !== 'string') return false;
         if (isNaN(Number(n))) return false;
@@ -24,4 +24,10 @@ export function stringToNumberValidator(
 
         return true;
     };
-}
+};
+stringToNumberValidator.positives = stringToNumberValidator(n => n > 0);
+stringToNumberValidator.negatives = stringToNumberValidator(n => n < 0);
+stringToNumberValidator.nonNegatives = stringToNumberValidator(n => n >= 0);
+stringToNumberValidator.nonPositives = stringToNumberValidator(n => n <= 0);
+
+export { stringToNumberValidator };

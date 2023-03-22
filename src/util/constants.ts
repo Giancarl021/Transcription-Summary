@@ -11,7 +11,7 @@ export default {
             requestsPerWindow: Number(
                 validate(
                     process.env.RATE_LIMIT_REQ_PER_WINDOW,
-                    stringToNumberValidator(n => n > 0),
+                    stringToNumberValidator.positives,
                     '2'
                 )
             ),
@@ -19,7 +19,7 @@ export default {
                 Number(
                     validate(
                         process.env.RATE_LIMIT_WINDOW_MINUTES,
-                        stringToNumberValidator(n => n > 0),
+                        stringToNumberValidator.positives,
                         '1'
                     )
                 )
