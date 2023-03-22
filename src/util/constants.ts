@@ -1,18 +1,38 @@
 import locate from '@giancarl021/locate';
 import LogLevel from '../interfaces/LogLevel';
 import { gigabytes } from './storageSize';
+import { minutes } from './timeOperations';
+import validate, { stringToNumberValidator } from './validate';
 
 export default {
     limits: {
-        maximumFileSize: gigabytes(1)
-    },
+        maximumFileSize: gigabytes(1),
+        rateLimit: {
+            requestsPerWindow: Number(
+                validate(
+                    process.env.RATE_LIMIT_REQ_PER_WINDOW,
+                    stringToNumberValidator(n => n > 0),
+                    '2'
+                )
+            ),
+            window: minutes(
+                Number(
+                    validate(
+                        process.env.RATE_LIMIT_WINDOW_MINUTES,
+                        stringToNumberValidator(n => n > 0),
+                        '1'
+                    )
+                )
+            )
+        } as const
+    } as const,
     paths: {
         temp: locate('tmp'),
         root: locate('.')
-    },
+    } as const,
     keys: {
         openAi: process.env.OPEN_AI_KEY
-    },
+    } as const,
     summarization: {
         systemMessage(lang: string) {
             return (
@@ -20,9 +40,9 @@ export default {
                 lang
             );
         }
-    },
+    } as const,
     log: {
         level: (String(process.env.LOG_LEVEL).toLowerCase() ||
             'info') as LogLevel
-    }
+    } as const
 };
