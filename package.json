@@ -8,12 +8,12 @@
     "license": "MIT",
     "private": false,
     "files": [
-        "lib/**/*"
+        "dist/**/*"
     ],
     "scripts": {
         "dev": "ts-node index.ts",
         "format": "prettier -w --config .prettierrc --ignore-path .gitignore .",
-        "start": "node lib/index.js",
+        "start": "node dist/index.js",
         "prestart": "yarn build",
         "build": "tsc",
         "git-add": "git add ."

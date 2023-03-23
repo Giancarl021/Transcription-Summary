@@ -48,5 +48,8 @@ export default {
             l => Boolean(l && Object.keys(LogLevelValues).includes(l)),
             'info'
         )
-    } as const
+    } as const,
+    port: Number(
+        validate(process.env.PORT, stringToNumberValidator.positives, '80')
+    )
 };
